@@ -9,6 +9,15 @@ use Phpml\Exception\SerializeException;
 
 class ModelManager
 {
+    /**
+     * @param Estimator $estimator
+     * @param string $filepath
+     *
+     * @return void
+     *
+     * @throws FileException
+     * @throws SerializeException
+     */
     public function saveToFile(Estimator $estimator, string $filepath): void
     {
         if (!is_writable(dirname($filepath))) {
@@ -26,17 +35,43 @@ class ModelManager
         }
     }
 
-    public function restoreFromFile(string $filepath): Estimator
+    /**
+     * @param string $filePath
+     *
+     * @return Estimator
+     *
+     * @throws FileException
+     * @throws SerializeException
+     */
+    public function restoreFromFile(string $filePath): Estimator
     {
-        if (!file_exists($filepath) || !is_readable($filepath)) {
-            throw FileException::cantOpenFile(basename($filepath));
+        if (!file_exists($filePath) || !is_readable($filePath)) {
+            throw FileException::cantOpenFile(basename($filePath));
         }
 
-        $object = unserialize(file_get_contents($filepath));
+        $object = unserialize(file_get_contents($filePath));
         if ($object === false) {
-            throw SerializeException::cantUnserialize(basename($filepath));
+            throw SerializeException::cantUnserialize(basename($filePath));
         }
 
         return $object;
+    }
+
+    /**
+     * @param string $filePath
+     *
+     * @return void
+     *
+     * @throws FileException
+     */
+    public function reset(string $filePath): void
+    {
+        if (!file_exists($filePath) || !is_readable($filePath)) {
+            throw FileException::cantOpenFile(basename($filePath));
+        }
+
+        if (!unlink($filePath)) {
+            throw FileException::cantDeleteFile(basename($filePath));
+        }
     }
 }
