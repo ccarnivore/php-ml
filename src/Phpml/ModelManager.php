@@ -9,19 +9,10 @@ use Phpml\Exception\SerializeException;
 
 class ModelManager
 {
-    /**
-     * @param Estimator $estimator
-     * @param string $filepath
-     *
-     * @return void
-     *
-     * @throws FileException
-     * @throws SerializeException
-     */
-    public function saveToFile(Estimator $estimator, string $filepath): void
+    public function saveToFile(Estimator $estimator, string $filePath): void
     {
-        if (!is_writable(dirname($filepath))) {
-            throw FileException::cantSaveFile(basename($filepath));
+        if (!is_writable(dirname($filePath))) {
+            throw FileException::cantSaveFile(basename($filePath));
         }
 
         $serialized = serialize($estimator);
@@ -29,20 +20,12 @@ class ModelManager
             throw SerializeException::cantSerialize(gettype($estimator));
         }
 
-        $result = file_put_contents($filepath, $serialized, LOCK_EX);
+        $result = file_put_contents($filePath, $serialized, LOCK_EX);
         if ($result === false) {
-            throw FileException::cantSaveFile(basename($filepath));
+            throw FileException::cantSaveFile(basename($filePath));
         }
     }
 
-    /**
-     * @param string $filePath
-     *
-     * @return Estimator
-     *
-     * @throws FileException
-     * @throws SerializeException
-     */
     public function restoreFromFile(string $filePath): Estimator
     {
         if (!file_exists($filePath) || !is_readable($filePath)) {
@@ -57,14 +40,7 @@ class ModelManager
         return $object;
     }
 
-    /**
-     * @param string $filePath
-     *
-     * @return void
-     *
-     * @throws FileException
-     */
-    public function reset(string $filePath): void
+    public function resetFile(string $filePath): void
     {
         if (!file_exists($filePath) || !is_readable($filePath)) {
             throw FileException::cantOpenFile(basename($filePath));
